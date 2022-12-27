@@ -36,7 +36,7 @@ const CanvasContextProvider = () => {
 		if (canvasContext) return;
 
 		setCanvasContext(canvasRef.current?.getContext("2d"));
-	});
+	}, [canvasContext]);
 
 	const getMousePos = (
 		canvas: HTMLCanvasElement,
