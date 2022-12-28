@@ -54,6 +54,14 @@ const CanvasHandler = (canvas: HTMLCanvasElement) => {
 		//canvasContext.globalCompositeOperation = "source-over";
 		canvasContext.strokeStyle = "#000";
 		canvasContext.stroke(shape.path);
+
+		canvasContext.fillStyle = "#fff";
+		canvasContext.fillRect(
+			shape.location.x,
+			shape.location.y,
+			shape.size.width,
+			shape.size.height
+		);
 	};
 
 	const clearShape = (
@@ -78,35 +86,54 @@ const CanvasHandler = (canvas: HTMLCanvasElement) => {
 			unselectShape(selectedShape);
 		}
 
-		canvasContext.beginPath();
-		canvasContext.clearRect(
+		shape.path = new Path2D();
+		shape.path.rect(
 			shape.location.x,
 			shape.location.y,
 			shape.size.width,
 			shape.size.height
 		);
+		shape.path.closePath();
+
 		canvasContext.strokeStyle = "red";
 		canvasContext.stroke(shape.path);
+
+		canvasContext.fillStyle = "#fff";
+		canvasContext.fillRect(
+			shape.location.x,
+			shape.location.y,
+			shape.size.width,
+			shape.size.height
+		);
+
 		selectedShape = shape;
 		isDragging = true;
 		shouldDraw = true;
 		draggedShape = shape;
-		canvasContext.closePath();
 	};
 
 	const unselectShape = (shape: Shape) => {
 		if (!canvasContext) return;
 
-		canvasContext.beginPath();
-		canvasContext.clearRect(
+		shape.path = new Path2D();
+		shape.path.rect(
 			shape.location.x,
 			shape.location.y,
 			shape.size.width,
 			shape.size.height
 		);
+		shape.path.closePath();
+
 		canvasContext.strokeStyle = "#000";
 		canvasContext.stroke(shape.path);
-		canvasContext.closePath();
+
+		canvasContext.fillStyle = "#fff";
+		canvasContext.fillRect(
+			shape.location.x,
+			shape.location.y,
+			shape.size.width,
+			shape.size.height
+		);
 	};
 
 	const mouseDown = (event: MouseEvent) => {
@@ -162,8 +189,6 @@ const CanvasHandler = (canvas: HTMLCanvasElement) => {
 
 		drawShape(canvasContext, shape);
 		shapes.push(shape);
-
-		clearShape(canvasContext, shape);
 	};
 
 	const mouseMove = (event: MouseEvent) => {
@@ -178,17 +203,19 @@ const CanvasHandler = (canvas: HTMLCanvasElement) => {
 				const deltaX = lastMouseX - mousePos.x;
 				const deltaY = lastMouseY - mousePos.y;
 
-				shape.location = {
-					x: shape.location.x - deltaX,
-					y: shape.location.y - deltaY,
+				draggedShape.location = {
+					x: draggedShape.location.x - deltaX,
+					y: draggedShape.location.y - deltaY,
 				};
 
 				lastMouseX = mousePos.x;
 				lastMouseY = mousePos.y;
+			} else {
+				drawShape(canvasContext, shape);
 			}
-
-			drawShape(canvasContext, shape);
 		}
+
+		drawShape(canvasContext, draggedShape!);
 	};
 
 	const throttle = (callback: (...args: any[]) => void, delay: number) => {
